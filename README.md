@@ -1,5 +1,16 @@
 # algorithm-evaluator
 
+To install either 
+```sh
+pip install requirements.txt
+```
+
+Or manually install these two packages:
+
+```
+uvicorn[standard] fastapi
+```
+
 To run the evaluator
 ```sh
 uvicorn main:app --reload
@@ -14,6 +25,20 @@ Or run a command from the `script` folder
 ```sh
 ./get_by_id 38a52d03-37e0-4d28-a7a8-3e800a633ce9 
 ```
+
+
+## To reset database
+
+The `generator.py` can create a new database from `initialiser.sql` (and adds one entry)
+```sh
+python3 generator.py init
+```
+
+If you would like to populate with more randomized examples
+```sh
+python3 generator.py populate
+```
+
 
 ## Database structure
 - `id`
