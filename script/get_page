@@ -1,8 +1,0 @@
-#!/bin/env sh
-
-. ./profile
-
-offset="${1}"
-limit="${2}"
-
-curl -X GET "${resource}/page/offset/${offset}/limit/${limit}"

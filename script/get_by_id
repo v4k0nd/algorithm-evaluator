@@ -1,7 +1,0 @@
-#!/bin/env sh
-
-. ./profile
-
-id="${1}"
-
-curl -X GET "${resource}/id/${id}"
