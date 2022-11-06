@@ -14,7 +14,8 @@ def connect():
 
 def objectify(row):
     obj = dict(row)
-    obj['roc_ys'] = list(map(float, obj['roc_ys'].split(',')))
+    if 'roc_ys' in obj:
+        obj['roc_ys'] = list(map(float, obj['roc_ys'].split(',')))
     return obj
 
 
