@@ -1,0 +1,2 @@
+'{"id": null, "algorithm": "some-fancy-schmancy-algorithm", "dataset": "blabla-trolo-lolo", "roc_ys": [0.5, 0.312, 0.312, 0.75, 0.89, 0.69], "actual_0": 15312, "actual_1": 69752, "predicted_0": 126123, "predicted_1": 10297434132, "f1_score": 0.69, "datetime": null}'
+'{"id": null, "algorithm": "some-fancy-schmancy-algorithm", "dataset": "blabla-trolo-lolo", "roc_ys": [0.5, 0.312, 0.312, 0.75, 0.89, 0.69], "actual_0": 15312, "actual_1": 69752, "predicted_0": 126123, "predicted_1": 10297434132, "f1_score": 0.69, "datetime": "1993-11-01T09:11:00"}'
