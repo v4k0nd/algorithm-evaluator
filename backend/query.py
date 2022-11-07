@@ -25,8 +25,8 @@ VALUES (
     , :f1_score
     , :datetime
 )
-RETURNING id
 '''
+# RETURNING id
 
 get = '''
 SELECT *

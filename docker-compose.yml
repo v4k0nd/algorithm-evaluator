@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  back-end:
+    image: python:3.10-slim
+    volumes:
+      - "./:/usr/src/app/:z"
+    working_dir: "/usr/src/app"
+    command: ./build-and-run-backend.sh
+    ports:
+      - "8080:8000"
+    networks:
+      - "inner_network"
+  front-end:
+    image: python:3.10-slim
+    volumes:
+      - "./:/usr/src/app/:z"
+    working_dir: "/usr/src/app"
+    command: ./build-and-run-frontend.sh
+    ports:
+      - "8501:8501"
+    depends_on:
+      - "back-end"
+    networks:
+      - "inner_network"
+networks:
+  inner_network:
+    driver: bridge

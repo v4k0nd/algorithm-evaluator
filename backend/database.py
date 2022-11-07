@@ -54,11 +54,13 @@ def get_by_id(uuid):
 
 
 def post(parameter):
-    parameter['id'] = str(uuid4() if parameter['id'] is None else parameter['id'])
+    new_id = str(uuid4() if parameter['id'] is None else parameter['id'])
+    parameter['id'] = new_id
     parameter['roc_ys'] = ','.join(map(str, parameter['roc_ys']))
     parameter['roc_xs'] = ','.join(map(str, parameter['roc_xs']))
     parameter['datetime'] = datetime.now() if parameter['datetime'] is None else parameter['datetime']
-    return execute(query.post, parameter)
+    execute(query.post, parameter)
+    return [new_id]
 
 
 def delete_by_id(uuid):

@@ -5,13 +5,13 @@
   <img src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/app_preview.png">
 </p>
 
-# Install
+# Install (locally)
 ```sh
 git clone https://github.com/v4k0nd/algorithm-evaluator.git
 cd algorithm-evaluator
-pip install requirements.txt
+pip install -r requirements.txt
 # or
-pip install "uvicorn[standard]" fastapi jinja2 matplotlib rich sklearn pandas streamlit numpy
+pip install "uvicorn[standard]" fastapi jinja2 matplotlib sklearn pandas streamlit numpy
 ```
 
 # Starting services

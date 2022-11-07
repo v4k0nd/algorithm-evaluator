@@ -1,26 +1,57 @@
-import uuid
+from typing import TYPE_CHECKING, List
 import pandas as pd
 import streamlit as st
-from rich import print as rprint
 from sklearn import metrics
-import streamlit as st
 from datetime import datetime
+import uuid
 import json
 import requests
 
+# local imports
+from script.roc_helper import create_roc_label, table_setup, conf_matrix_to_list
+from model.Card import Card
+
+if TYPE_CHECKING:
+    from streamlit.delta_generator import DeltaGenerator
+
 # options
-save = True # save to database the csv input
+SAVE = True  # save to database the csv input
+CSV_COLUMN_NAME_GROUND_TRUTH = "groundTruth"
+
 
 # backend server
-URL = 'http://localhost:8000'
-URL_POST = f"{URL}/api/result"
-URL_GET_ALL = f"{URL}/api/results"
-URL_GET_FULL = f"{URL}/api/results/full"
-URL_GET_BY_ID = f"{URL}/api/result/id/"
+URL = 'http://algorithm-evaluator-back-end-1:8000'
+URL_API = f"{URL}/api"
+
+URL_POST = f"{URL_API}/result"
+URL_GET_ALL = f"{URL_API}/results"
+URL_GET_FULL = f"{URL_API}/results/full"
+URL_GET_BY_ID = f"{URL_API}/result/id/"
 
 
+def save_to_db(algorithm_name: str, conf_matrix_results: List[int], f1_score: float, y: list, X_confidence: list):
+    # things to save to the database
+    json_to_save = {}
+    json_to_save['id'] = str(uuid.uuid4())
+    json_to_save['algorithm'] = algorithm_name
+    json_to_save['dataset'] = "artis10000"
+    json_to_save['roc_ys'] = y.tolist()  # df["groundTruth"].tolist()
+    json_to_save['roc_xs'] = X_confidence.tolist()  # df[column_label].tolist()
+    json_to_save['actual_0'] = conf_matrix_results[0]
+    json_to_save['actual_1'] = conf_matrix_results[1]
+    json_to_save['predicted_0'] = conf_matrix_results[2]
+    json_to_save['predicted_1'] = conf_matrix_results[3]
+    json_to_save['f1_score'] = f1_score
+    json_to_save['datetime'] = datetime.now(
+    ).isoformat(sep=" ", timespec="seconds")
 
-def find_algorithm_names(df):
+    json_result = json.dumps(json_to_save, default=str)
+
+    req = requests.post(URL_POST, json_result)
+    # rprint(f"\nresponse from request: {req.text}")
+
+
+def find_algorithm_names(df: pd.DataFrame) -> list:
     algorithm_names = []
     for column_headers in df.columns:
         strsplit = column_headers.split("_")
@@ -30,158 +61,102 @@ def find_algorithm_names(df):
     return algorithm_names
 
 
-def table_setup(tn, fn, fp, tp):
-    _data = [[str(tn),  str(fn)], [str(fp), str(tp)]]
-    return pd.DataFrame(data=_data, index=['predicted 0', 'predicted 1'], columns=['actual 0', 'actual 1'])
+def compute(y: list, X_confidence: list, threshold: float):
+    return compute(y, X_confidence, X_label=create_roc_label(X_confidence, threshold))
 
 
-def confusion_matrix_create(column_name, columnlabel, y, X):
-    # y = df["groundTruth"] 
-    # X = df[column_name]
-    rprint("inside of y:\n",y)
-    rprint("inside of x:\n",X)
-    tn, fp, fn, tp = metrics.confusion_matrix(y, X).ravel()
-   
-    df_table = table_setup(tn, fp, fn, tp)
-    columnlabel.table(df_table)
-   
-    f1 = metrics.f1_score(y, X)
-    format_float_f1 = round(f1,3)
-    card_f1 = f'<h3>F1 score</h3>\n<b>{format_float_f1}</b>'
-    columnlabel.markdown(card_f1, unsafe_allow_html=True)
-    return str(tn), str(tp), str(fn), str(fp), format_float_f1
+def compute(y: list, X_confidence: list, X_label: list) -> Card:
+    tn, fp, fn, tp = metrics.confusion_matrix(y, X_label).ravel()
+    f1 = metrics.f1_score(y, X_label)
+    fig_roc = metrics.RocCurveDisplay.from_predictions(y, X_confidence)
+    card_data = Card(fig_roc, tn, fp, fn, tp, f1)
+
+    # format_float_f1 = round(f1,2)
+    return card_data
 
 
-def ROC_create(column_name, columnlabel, y, X):
-    # y = df["groundTruth"]  # definite truth
-    # X = df[column_name] # This should be the confidence scores and not the predicted labels
-    # val_count = y.value_counts()
-    # total = len(y)
+def create_card(column: List["DeltaGenerator"], algorithm_name: str, card_data: Card):
+    with column:
+        st.subheader(algorithm_name)
 
-    rprint(f"\nthe y values from csv \n{y}")
-    rprint(f"\nthe X values from csv \n{X}")
-    columnlabel.pyplot(fig_roc.figure_)
-    return fig_roc
+        # ROC creation
+        st.subheader("ROC curve")
+        st.pyplot(card_data.get_fig().figure_)
+
+        # Conf matrix creation
+        st.subheader(f"Confidence matrix")
+        # card_data.get_conf_matrix_list()
+        df_table = card_data.get_conf_matrix_pd()
+        st.table(df_table)
+
+        # f1 score creation
+        st.subheader("f1 score")
+        st.text(card_data.get_f1())
+
+    # return
 
 
-def show_results(algorithm_name, column_label, y, X):
-    card_title = f'<h2>{algorithm_name.capitalize()} results</h2>'
-    card_roc = '<h3> ROC curve </h3>'
-    card_conf_m = '<h3> Confusion matrix</h3>'
-    column_label.markdown(card_title, unsafe_allow_html=True)
-#     st.write (algorithm_name+ " algorithm results")
-    column_label.markdown(card_roc, unsafe_allow_html=True)
-    fig_ROC = ROC_create("accuracy_"+algorithm_name, column_label, y, X)
-    column_label.markdown(card_conf_m, unsafe_allow_html=True)
-    conf_matrix_results = confusion_matrix_create(
-        "labels_"+algorithm_name, column_label, y, X)
-    
-    if save == True:
-        save_to_db(algorithm_name, conf_matrix_results, "labels_"+algorithm_name, y, X)
-    # ROC to string
-    #X = np.array(fig_ROC.figure_.canvas.renderer.buffer_rgba())
-    # print(fig_ROC)
+if __name__ == "__main__":
+    # x_label is for conf-matrix and f1 score
+    # x_confidence is for ROC graph
 
-def save_to_db(algorithm_name, conf_matrix_results, column_label, y, X):
-    # things to save to the database
-    json_to_save = {}
-    json_to_save['id'] = str(uuid.uuid4())
-    json_to_save['algorithm'] = algorithm_name
-    json_to_save['dataset'] = "artis10000"
-    json_to_save['roc_ys'] = y.tolist() # df["groundTruth"].tolist()
-    json_to_save['roc_xs'] = X.tolist() # df[column_label].tolist()
-    json_to_save['actual_0'] = conf_matrix_results[0]
-    json_to_save['actual_1'] = conf_matrix_results[1]
-    json_to_save['predicted_0'] = conf_matrix_results[2]
-    json_to_save['predicted_1'] = conf_matrix_results[3]
-    json_to_save['f1_score'] = conf_matrix_results[4]
-    json_to_save['datetime'] = datetime.now().isoformat(sep=" ", timespec="seconds")
-
-    json_result = json.dumps(json_to_save, default=str)
-
-    req = requests.post(URL_POST, json_result)
-    rprint(f"\nresponse from request: {req.text}")
-
-def select_result(id):
-    req = requests.get(f"{URL_GET_BY_ID}{id}")
-    # req = requests.get(f"{URL_GET_BY_ID}{st.session_state['id']}")
-    ret_json = req.json()
-    print(ret_json)
-    y = ret_json["roc_ys"]
-    X = ret_json["roc_xs"]
-    alg_name = ret_json["algorithm"]
-    column_label =  st.columns(3, gap="medium")[0]
-    card_title = f'<h2>{alg_name} results</h2>'
-    column_label.markdown(card_title, unsafe_allow_html=True)
-#     st.write (algorithm_name+ " algorithm results")
-    
-    card_roc = '<h3> ROC curve </h3>'
-    column_label.markdown(card_roc, unsafe_allow_html=True)
-    fig_ROC = ROC_create("accuracy_"+alg_name, column_label, y, X)
-    
-    card_conf_m = '<h3> Confusion matrix</h3>'
-    column_label.markdown(card_conf_m, unsafe_allow_html=True)
-    
-    tn, fp, fn, tp = metrics.confusion_matrix(y, X).ravel()
-    df_table = table_setup(tn, fp, fn, tp)
-    column_label.table(df_table)
-
-    f1 = metrics.f1_score(y, X)
-    format_float_f1 = round(f1,3)
-    card_f1 = f'<h3>F1 score</h3>\n<b>{format_float_f1}</b>'
-    column_label.markdown(card_f1, unsafe_allow_html=True)
-    # print(dff)
-    # print(str(tn))
-    # print(str(tp))
-    return str(tn), str(tp), str(fn), str(fp), format_float_f1
-    
-    
-def select_helper():
-    print("option: ",option)
-
-req = requests.get(URL_GET_ALL)
-rprint(f"\nRequesting all algname and id: {req.text}")
-res_json = req.json()
-
-with st.form("dataset"):
-    prepared_options = [e["algorithm"]+" - "+e["id"] for e in res_json]
-    prepared_options.insert(0, "None")
-    option = st.selectbox(
-        'Which result would you like to use',
-        index=0,
-        options=prepared_options,
-        # on_change=select_helper, 
-        # args=option.split(" - ")[1]
+    st.title("Algorithm evaluator")
+    st.text("Choose from previous database entries or upload csv")
+    req = requests.get(URL_GET_ALL)
+    res_json = req.json()
+    with st.form("dataset"):
+        st.header('Retrieve from db')
+        prepared_options = [e["algorithm"]+" - "+e["id"] for e in res_json]
+        prepared_options.insert(0, "None")
+        option = st.selectbox(
+            'Choose result would you like to use, if none, upload a csv first below',
+            index=0,
+            options=prepared_options,
+            # on_change=select_helper,
+            # args=option.split(" - ")[1]
         )
-    submitted = st.form_submit_button("Submit")
-    if submitted:
-        select_result(option.split(" - ")[1])
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            try:
+                id = option.split(" - ")[1]
+                req = requests.get(f"{URL_GET_BY_ID}{id}")
+                ret_json = req.json()
+                print(ret_json)
 
-# print(res_json)
-# prepared_options = {"0": "None"}
-# for e in res_json:
-#     prepared_options[e["id"]] = e["algorithm"]
-    
-# option = st.selectbox('Which result would you like to use', 
-#                       prepared_options.keys(), 
-#                       format_func=lambda x:prepared_options[ x ])
+                y = ret_json["roc_ys"]
+                X_confidence = ret_json["roc_xs"]
+                X_label = create_roc_label(x_conf=X_confidence, threshold=0.5)
 
-# st.write('You selected:', option)
+                algorithm_name = ret_json["algorithm"]
+                column = st.columns(3, gap="medium")[0]
+                card_data = compute(y, X_confidence, X_label)
+                # exit()
+                create_card(column, algorithm_name, card_data)
+            except IndexError:
+                # st.error(‘Please enter a valid input’)
+                st.error(
+                    'There are no entries in the database, upload a csv to save results to  the database', icon="🚨")
 
+    st.header('CSV upload')
+    agree = st.checkbox(
+        'I want to save the result to the database.', value=True)
+    uploaded_file = st.file_uploader("Choose a  CSV file", type=[
+        'csv'], help="for each algorithm name an 'accuracy_' and 'labels_' columns is expected")
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
 
-uploaded_file = st.file_uploader("Choose a  CSV file", type=['csv'])
+        alg_names = find_algorithm_names(df)
+        columns = st.columns(len(alg_names), gap="medium")
 
-
-if uploaded_file is not None:
-    # read csv
-    df = pd.read_csv(uploaded_file)
-    algorithm_results = []
-    temp_test = find_algorithm_names(df)
-    columns = st.columns(len(temp_test), gap="medium")
-    for i in range(0, len(temp_test)):
-        rprint(columns[i])
-        y = df["groundTruth"]
-        X_acc = df["accuracy_"+temp_test[i]]
-        X_label = df["label_"+temp_test[i]]
-        algorithm_results.append(show_results(temp_test[i], columns[i], y, X_acc, X_label))
-        
+        for i in range(0, len(alg_names)):
+            algorithm_name = alg_names[i]
+            column = columns[i]
+            y = df[CSV_COLUMN_NAME_GROUND_TRUTH]
+            X_confidence = df[f"accuracy_{algorithm_name}"]
+            X_label = df[f"labels_{algorithm_name}"]
+            card_data = compute(y, X_confidence, X_label)
+            # exit()
+            create_card(column, algorithm_name, card_data)
+            if agree:
+                save_to_db(algorithm_name, card_data.get_conf_matrix_list(
+                ), card_data.get_f1(), y, X_confidence)

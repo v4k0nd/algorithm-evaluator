@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING, List
-import uuid
 import pandas as pd
 import streamlit as st
-from rich import print as rprint
 from sklearn import metrics
-import streamlit as st
 from datetime import datetime
+import uuid
 import json
 import requests
+
+# local imports
 from script.roc_helper import create_roc_label, table_setup, conf_matrix_to_list
 from model.Card import Card
 
@@ -20,7 +20,7 @@ CSV_COLUMN_NAME_GROUND_TRUTH = "groundTruth"
 
 
 # backend server
-URL = 'http://localhost:8000'
+URL = 'http://algorithm-evaluator-back-end-1:8000'
 URL_API = f"{URL}/api"
 
 URL_POST = f"{URL_API}/result"
