@@ -32,11 +32,13 @@ Open the URL the frontend gives (probably http://localhost:8501), and upload a c
 
 The `generator.py` can create a new database from `initialiser.sql` (and adds one entry)
 ```sh
+cd backend
 python3 generator.py init
 ```
 
 If you would like to populate with more randomized examples
 ```sh
+cd backend
 python3 generator.py populate
 ```
 
