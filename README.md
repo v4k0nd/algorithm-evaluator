@@ -1,17 +1,24 @@
 # algorithm-evaluator
 
-To install either 
+### **For evaluating algorithms powered by streamlit and fastapi**
+
+# Install
+```sh
+git clone https://github.com/v4k0nd/algorithm-evaluator.git
+```
+
+
+Install packages either by
 ```sh
 pip install requirements.txt
 ```
 
 Or manually install these packages:
-
 ```
 pip install "uvicorn[standard]" fastapi jinja2 matplotlib rich sklearn pandas streamlit numpy
 ```
 
-## Starting services
+# Starting services
 
 To start the backend
 ```sh
@@ -26,7 +33,7 @@ To start the frontend
 Open the URL the frontend gives, and upload a csv.
 
 
-## To reset database
+# To reset database
 
 The `generator.py` can create a new database from `initialiser.sql` (and adds one entry)
 ```sh
@@ -39,7 +46,7 @@ python3 generator.py populate
 ```
 
 
-## Database structure
+# Database structure
 - `id`
     - :label: uuid
     - :memo: universally unique identifier
