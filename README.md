@@ -8,7 +8,7 @@ pip install requirements.txt
 Or manually install these packages:
 
 ```
-uvicorn[standard] fastapi jinja2 matplotlib rich sklearn pandas streamlit numpy
+pip install "uvicorn[standard]" fastapi jinja2 matplotlib rich sklearn pandas streamlit numpy
 ```
 
 ## Starting services
@@ -22,6 +22,8 @@ To start the frontend
 ```sh
 ./start_frontend.sh
 ```
+
+Open the URL the frontend gives, and upload a csv.
 
 
 ## To reset database
