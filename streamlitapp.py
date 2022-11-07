@@ -50,7 +50,7 @@ def confusion_matrix_create(column_name, columnlabel):
     blankIndex = [''] * len(dff)
     dff.index = blankIndex
     columnlabel.table(dff)
-    new_title1 = '<p style="font-family:sans-serif; color:Black; font-size: 36px;">'
+    new_title1 = '<p style="font-family:sans-serif;  font-size: 36px;">'
     format_float_f1 = "{:.2f}".format(f1)
     new_title2 = 'F1 score: ' + str(format_float_f1)+'</p>'
     new_title = new_title1+new_title2
@@ -76,17 +76,16 @@ def ROC_create(column_name, columnlabel):
 
 
 def show_results(algorithm_name, column_label):
-    new_title1 = '<p style="font-family:sans-serif; color:Blue; font-size: 36px;">'
-    new_title2 = algorithm_name.capitalize()+' results</p>'
-    new_title = new_title1+new_title2
-    new_subtitle1 = '<p style="font-family:sans-serif; color:Black; font-size: 12px; text-align: center;">'
-    new_subtitle2 = "ROC curve " + '</p'
-    new_subtitle3 = "Confusion matrix " + '</p'
-    column_label.markdown(new_title, unsafe_allow_html=True)
+    # new_title1 = '<p style="font-family:sans-serif;  font-size: 34px;">'
+    # new_title2 = algorithm_name.capitalize()+' results</p>'
+    card_title = f'<h2>{algorithm_name.capitalize()} results</h2>'
+    card_roc = f'<h3> ROC curve </h3>'
+    card_conf_m = '<h3> Confusion matrix</h3>'
+    column_label.markdown(card_title, unsafe_allow_html=True)
 #     st.write (algorithm_name+ " algorithm results")
-    column_label.markdown(new_subtitle1+new_subtitle2, unsafe_allow_html=True)
+    column_label.markdown(card_roc, unsafe_allow_html=True)
     fig_ROC = ROC_create("accuracy_"+algorithm_name, column_label)
-    column_label.markdown(new_subtitle1+new_subtitle3, unsafe_allow_html=True)
+    column_label.markdown(card_conf_m, unsafe_allow_html=True)
     conf_matrix_results = confusion_matrix_create(
         "labels_"+algorithm_name, column_label)
     
