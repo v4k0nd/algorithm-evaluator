@@ -5,24 +5,41 @@
   <img src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/app_preview.png">
 </p>
 
-# Install (locally)
+# Install and run via docker (recommended)
+```sh
+docker compose up [-d] # detached mode
+```
+
+The web-app should be available under http://localhost:8501, and upload a csv.
+
+
+To stop the sercice, just `Ctrl + C`.
+
+
+To remove installed image
+```sh
+docker compose down [-d] # detached mode
+```
+
+# Install and run locally
 ```sh
 git clone https://github.com/v4k0nd/algorithm-evaluator.git
 cd algorithm-evaluator
 pip install -r requirements.txt
 # or
-pip install "uvicorn[standard]" fastapi jinja2 matplotlib sklearn pandas streamlit numpy
+pip install "uvicorn[standard]" fastapi jinja2 matplotlib sklearn pandas streamlit
 ```
-
-# Starting services
+## Starting the services
 
 To start the backend
 ```sh
+cd script
 ./start_backend.sh
 ```
 
 To start the frontend
 ```sh
+cd script
 ./start_frontend.sh
 ```
 

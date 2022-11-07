@@ -1,3 +1,3 @@
 #!/bin/sh
-cd backend 
+cd ../backend 
 uvicorn main:app --reload
