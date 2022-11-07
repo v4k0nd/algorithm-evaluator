@@ -5,25 +5,22 @@ To install either
 pip install requirements.txt
 ```
 
-Or manually install these two packages:
+Or manually install these packages:
 
 ```
-uvicorn[standard] fastapi
+uvicorn[standard] fastapi jinja2 matplotlib rich sklearn pandas streamlit numpy
 ```
 
-To run the evaluator
+## Starting services
+
+To start the backend
 ```sh
-uvicorn main:app --reload
+./start_backend.sh
 ```
 
-To test either open the webapp at the printed adress
+To start the frontend
 ```sh
-http://127.0.0.1:8000
-```
-
-Or run a command from the `script` folder
-```sh
-./get_by_id 38a52d03-37e0-4d28-a7a8-3e800a633ce9 
+./start_frontend.sh
 ```
 
 
@@ -51,8 +48,12 @@ python3 generator.py populate
     - :label: text 
     - :memo: contains name of the dataset
 - `roc_ys`
-    - :label: text 
+    - :label: list 
     - :memo: contains the y values for the ROC graph
+    - example: 0.5,0.312,0.312,0.75,0.89,0.69
+- `roc_ys`
+    - :label: list 
+    - :memo: contains the x values for the ROC graph
     - example: 0.5,0.312,0.312,0.75,0.89,0.69
 - `actual_0`
     - :label: text 
