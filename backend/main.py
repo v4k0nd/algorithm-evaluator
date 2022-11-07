@@ -19,9 +19,13 @@ async def main(request: Request):
     results = await get_all()
     return templates.TemplateResponse("index.html", {"request": request, "results": results})
     # return await get_page(offset=0, limit=100)
-    
+
 @app.get('/api/results')
 async def get_all():
+    return database.get_all()
+
+@app.get('/api/results/full')
+async def get_all_full():
     return await get_page(offset=0, limit=100)
 
 @app.post('/api/result')

@@ -16,6 +16,9 @@ def objectify(row):
     obj = dict(row)
     if 'roc_ys' in obj:
         obj['roc_ys'] = list(map(float, obj['roc_ys'].split(',')))
+        
+    if 'roc_xs' in obj:
+        obj['roc_xs'] = list(map(float, obj['roc_xs'].split(',')))
     return obj
 
 
@@ -41,6 +44,8 @@ def get(offset, limit):
     parameter['offset'] = offset
     return execute(query.get, parameter)
 
+def get_all():
+    return execute(query.get_all)
 
 def get_by_id(uuid):
     parameter = {'id': uuid}
@@ -51,6 +56,7 @@ def get_by_id(uuid):
 def post(parameter):
     parameter['id'] = str(uuid4() if parameter['id'] is None else parameter['id'])
     parameter['roc_ys'] = ','.join(map(str, parameter['roc_ys']))
+    parameter['roc_xs'] = ','.join(map(str, parameter['roc_xs']))
     parameter['datetime'] = datetime.now() if parameter['datetime'] is None else parameter['datetime']
     return execute(query.post, parameter)
 

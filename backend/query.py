@@ -4,6 +4,7 @@ INSERT INTO result(
     , algorithm
     , dataset
     , roc_ys
+    , roc_xs
     , actual_0
     , actual_1
     , predicted_0
@@ -16,6 +17,7 @@ VALUES (
     , :algorithm
     , :dataset
     , :roc_ys
+    , :roc_xs
     , :actual_0
     , :actual_1
     , :predicted_0
@@ -32,6 +34,11 @@ FROM result r
 ORDER BY r.id
 LIMIT :limit
 OFFSET :offset
+'''
+
+get_all = '''
+SELECT id, algorithm
+FROM result
 '''
 
 get_by_id = '''
