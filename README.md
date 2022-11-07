@@ -27,7 +27,7 @@ To start the frontend
 ```
 
 Open the URL the frontend gives (probably http://localhost:8501), and upload a csv.
-<img style="border:2px solid white;" src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/streamlit_running.png">
+<img src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/streamlit_running.png">
 
 
 # To reset database

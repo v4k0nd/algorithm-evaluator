@@ -43,6 +43,7 @@ def confusion_matrix_create(column_name, columnlabel):
     tn, fp, fn, tp = metrics.confusion_matrix(y, X).ravel()
 
     f1 = metrics.f1_score(y, X)
+    format_float_f1 = round(f1,3)
 
     dff['predicted 0'] = [str(tn), str(fn)]
     dff['predicted 1'] = [str(fp), str(tp)]
@@ -50,11 +51,8 @@ def confusion_matrix_create(column_name, columnlabel):
     blankIndex = [''] * len(dff)
     dff.index = blankIndex
     columnlabel.table(dff)
-    new_title1 = '<p style="font-family:sans-serif;  font-size: 36px;">'
-    format_float_f1 = "{:.2f}".format(f1)
-    new_title2 = 'F1 score: ' + str(format_float_f1)+'</p>'
-    new_title = new_title1+new_title2
-    columnlabel.markdown(new_title, unsafe_allow_html=True)
+    card_f1 = f'<h3>F1 score</h3>\n<b>{format_float_f1}</b>'
+    columnlabel.markdown(card_f1, unsafe_allow_html=True)
     # print(dff)
     # print(str(tn))
     # print(str(tp))
@@ -79,7 +77,7 @@ def show_results(algorithm_name, column_label):
     # new_title1 = '<p style="font-family:sans-serif;  font-size: 34px;">'
     # new_title2 = algorithm_name.capitalize()+' results</p>'
     card_title = f'<h2>{algorithm_name.capitalize()} results</h2>'
-    card_roc = f'<h3> ROC curve </h3>'
+    card_roc = '<h3> ROC curve </h3>'
     card_conf_m = '<h3> Confusion matrix</h3>'
     column_label.markdown(card_title, unsafe_allow_html=True)
 #     st.write (algorithm_name+ " algorithm results")
