@@ -1,2 +1,2 @@
 #!/bin/sh
-streamlit run streamlitapp.py
+streamlit run new_streamlit.py

@@ -14,29 +14,31 @@ CREATE TABLE result(
     datetime DATETIME NOT NULL
 );
 
-INSERT INTO result(
-      id
-    , algorithm
-    , dataset
-    , roc_ys
-    , roc_xs
-    , actual_0
-    , actual_1
-    , predicted_0
-    , predicted_1
-    , f1_score
-    , datetime
-)
-SELECT
-      '07f64fa8-40a8-492f-98d6-9f5ee0aa6be4' AS id
-     , 'detectron2_db_test' AS algorithm
-     , null AS dataset
-     , '0.6,0.5,0.2,0.4,0.1,0.1,0.4,0.3,0.0,0.9,0.0,0.2,0.0,0.3,0.7,0.4,0.8,0.0,0.1,0.2,0.6,0.7,0.3,0.8,0.0,0.5,0.5,0.9,0.2,0.3,0.4,0.6,0.4,0.9,0.1,0.4,0.1,0.3,0.5,0.1,0.2,0.4,0.1,0.3' AS roc_ys
-     ,'0.6,0.5,0.2,0.4,0.1,0.1,0.4,0.3,0.0,0.9,0.0,0.2,0.0,0.3,0.7,0.4,0.8,0.0,0.1,0.2,0.6,0.7,0.3,0.8,0.0,0.5,0.5,0.9,0.2,0.3,0.4,0.6,0.4,0.9,0.1,0.4,0.1,0.3,0.5,0.1,0.2,0.4,0.1,0.3' AS roc_xs
-     , 3862 AS actual_0
-     , 155 AS actual_1
-     , 782 AS predicted_0
-     , 2005 AS predicted_1
-     , 0.81 AS f1_score
-     , datetime('now', 'localtime') AS datetime
-;
+-- INSERT INTO result(
+--       id
+--     , algorithm
+--     , dataset
+--     , roc_ys
+--     , roc_xs
+--     , actual_0
+--     , actual_1
+--     , predicted_0
+--     , predicted_1
+--     , f1_score
+--     , datetime
+-- )
+-- SELECT
+--       '07f64fa8-40a8-492f-98d6-9f5ee0aa6be4' AS id
+--      , 'detectron2_db_test' AS algorithm
+--      , null AS dataset
+--      , '0.6,0.5,0.2,0.4,0.1,0.1,0.4,0.3,0.0,0.9,0.0,0.2,0.0,0.3,0.7,0.4,0.8,0.0,0.1,0.2,0.6,0.7,0.3,0.8,0.0,0.5,0.5,0.9,0.2,0.3,0.4,0.6,0.4,0.9,0.1,0.4,0.1,0.3,0.5,0.1,0.2,0.4,0.1,0.3' AS roc_ys
+--      ,'0.6,0.5,0.2,0.4,0.1,0.1,0.4,0.3,0.0,0.9,0.0,0.2,0.0,0.3,0.7,0.4,0.8,0.0,0.1,0.2,0.6,0.7,0.3,0.8,0.0,0.5,0.5,0.9,0.2,0.3,0.4,0.6,0.4,0.9,0.1,0.4,0.1,0.3,0.5,0.1,0.2,0.4,0.1,0.3' AS roc_xs
+--      , 3862 AS actual_0
+--      , 155 AS actual_1
+--      , 782 AS predicted_0
+--      , 2005 AS predicted_1
+--      , 0.81 AS f1_score
+--      , datetime('now', 'localtime') AS datetime
+-- ;
+
+
