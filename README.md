@@ -5,16 +5,9 @@
 # Install
 ```sh
 git clone https://github.com/v4k0nd/algorithm-evaluator.git
-```
-
-
-Install packages either by
-```sh
+cd algorithm-evaluator
 pip install requirements.txt
-```
-
-Or manually install these packages:
-```
+# or
 pip install "uvicorn[standard]" fastapi jinja2 matplotlib rich sklearn pandas streamlit numpy
 ```
 
