@@ -23,7 +23,7 @@ To start the frontend
 ./start_frontend.sh
 ```
 
-Open the URL the frontend gives, and upload a csv.
+Open the URL the frontend gives (probably http://localhost:8501), and upload a csv.
 <p align="center">
   <img src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/streamlit_running.png">
 </p>
