@@ -194,5 +194,5 @@ if __name__ == "__main__":
                 ), card_data.get_f1(), y, X_confidence)
         
         st.subheader("Multi ROC curve")
-        multi_figure.plot(ax=ax, alpha=0.5)
+        handles, labels = ax.get_legend_handles_labels()
         st.pyplot(multi_figure.figure_)
