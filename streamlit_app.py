@@ -6,6 +6,8 @@ from datetime import datetime
 import uuid
 import json
 import requests
+from rich import print as rprint
+import matplotlib.pyplot as plt
 
 # local imports
 from script.roc_helper import create_roc_label, table_setup, conf_matrix_to_list
@@ -76,13 +78,16 @@ def compute(y: list, X_confidence: list, X_label: list) -> Card:
     #      need to add new roc curve to `fig_roc`
     fig_roc = metrics.RocCurveDisplay.from_predictions(y, X_confidence) 
     
-    # fpr, tpr, thresholds = metrics.roc_curve(y, X_confidence)
-    # roc_auc = metrics.auc(fpr, tpr)
+    fpr, tpr, thresholds = metrics.roc_curve(y, X_confidence)
+    roc_auc = metrics.auc(fpr, tpr)
+    # rprint("auc", roc_auc) 
     # fig_roc = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
     
     card_data = Card(fig_roc, tn, fp, fn, tp, f1)
     return card_data
 
+def compute_multigraph(y, X_confidence, ax):
+    return metrics.RocCurveDisplay.from_predictions(y, X_confidence, ax=ax, alpha=0.8)
 
 def create_card(column: List["DeltaGenerator"], algorithm_name: str, card_data: Card):
     with column:
@@ -130,6 +135,9 @@ if __name__ == "__main__":
         submitted = st.form_submit_button("Submit")
         
         if submitted:
+            multi_figure = None
+            # ax = None
+            # ax = plt.gca()            
             try:
                 id = option.split(" - ")[1]
                 req = requests.get(f"{URL_GET_BY_ID}{id}")
@@ -141,14 +149,21 @@ if __name__ == "__main__":
 
                 algorithm_name = ret_json["algorithm"]
                 column = st.columns(1, gap="medium")[0]
+                
                 card_data = compute(y, X_confidence, X_label)
+                # multi_figure = compute_multigraph(y, X_confidence, ax)
                 create_card(column, algorithm_name, card_data)
+                
+                # st.subheader("Multi ROC curve")
+                # multi_figure.plot(ax=ax, alpha=0.5)
+                # st.pyplot(multi_figure.figure_)
             except IndexError as e:
                 st.error(
                     f'{e.__class__.__name__}. If there are no entries in the database, upload a csv and save results to the database 😄', icon="🚨")
     st.button('Clear DB',
               on_click=clean_db)
     st.header('CSV upload')
+    
     agree = st.checkbox(
         'I want to save the result to the database.', value=True)
     uploaded_file = st.file_uploader("Choose a  CSV file", type=[
@@ -158,7 +173,10 @@ if __name__ == "__main__":
 
         alg_names = find_algorithm_names(df)
         columns = st.columns(len(alg_names), gap="medium")
-
+        
+        multi_figure = None
+        ax = plt.gca()
+        
         for i in range(0, len(alg_names)):
             algorithm_name = alg_names[i]
             column = columns[i]
@@ -166,7 +184,15 @@ if __name__ == "__main__":
             X_confidence = df[f"accuracy_{algorithm_name}"]
             X_label = df[f"labels_{algorithm_name}"]
             card_data = compute(y, X_confidence, X_label)
+            
+            # save for generating a combined ROC graph
+            multi_figure = compute_multigraph(y, X_confidence, ax)
+            
             create_card(column, algorithm_name, card_data)
             if agree:
                 save_to_db(algorithm_name, card_data.get_conf_matrix_list(
                 ), card_data.get_f1(), y, X_confidence)
+        
+        st.subheader("Multi ROC curve")
+        multi_figure.plot(ax=ax, alpha=0.5)
+        st.pyplot(multi_figure.figure_)

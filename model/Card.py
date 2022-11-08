@@ -39,3 +39,5 @@ class Card:
     def get_fig(self) -> RocCurveDisplay:
         return self.fig
     
+# class CardMultiGraph(Card):
+    
