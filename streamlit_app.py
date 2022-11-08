@@ -134,7 +134,6 @@ if __name__ == "__main__":
                 id = option.split(" - ")[1]
                 req = requests.get(f"{URL_GET_BY_ID}{id}")
                 ret_json = req.json()
-                print(ret_json)
 
                 y = ret_json["roc_ys"]
                 X_confidence = ret_json["roc_xs"]
