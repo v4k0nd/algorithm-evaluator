@@ -13,10 +13,10 @@ docker compose up [-d] # detached mode
 The web-app should be available under http://localhost:8501, and upload a csv.
 
 
-To stop the sercice, just `Ctrl + C`.
+To stop the service, just `Ctrl + C`.
 
 
-To remove installed image
+To remove installed container
 ```sh
 docker compose down [-d] # detached mode
 ```
