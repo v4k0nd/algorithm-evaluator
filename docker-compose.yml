@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+  
   back-end:
     image: python:3.10-slim
     volumes:
@@ -11,6 +12,7 @@ services:
       - "8080:8000"
     networks:
       - "inner_network"
+  
   front-end:
     image: python:3.10-slim
     volumes:
@@ -23,6 +25,7 @@ services:
       - "back-end"
     networks:
       - "inner_network"
+
 networks:
   inner_network:
     driver: bridge

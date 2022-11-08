@@ -27,7 +27,10 @@ URL_POST = f"{URL_API}/result"
 URL_GET_ALL = f"{URL_API}/results"
 URL_GET_FULL = f"{URL_API}/results/full"
 URL_GET_BY_ID = f"{URL_API}/result/id/"
+URL_DELETE_ALL = f"{URL_API}/result/remove"
 
+def clean_db():
+    requests.delete(URL_DELETE_ALL)
 
 def save_to_db(algorithm_name: str, conf_matrix_results: List[int], f1_score: float, y: list, X_confidence: list):
     # things to save to the database
@@ -35,8 +38,8 @@ def save_to_db(algorithm_name: str, conf_matrix_results: List[int], f1_score: fl
     json_to_save['id'] = str(uuid.uuid4())
     json_to_save['algorithm'] = algorithm_name
     json_to_save['dataset'] = "artis10000"
-    json_to_save['roc_ys'] = y.tolist()  # df["groundTruth"].tolist()
-    json_to_save['roc_xs'] = X_confidence.tolist()  # df[column_label].tolist()
+    json_to_save['roc_ys'] = y.tolist()
+    json_to_save['roc_xs'] = X_confidence.tolist()
     json_to_save['actual_0'] = conf_matrix_results[0]
     json_to_save['actual_1'] = conf_matrix_results[1]
     json_to_save['predicted_0'] = conf_matrix_results[2]
@@ -48,7 +51,6 @@ def save_to_db(algorithm_name: str, conf_matrix_results: List[int], f1_score: fl
     json_result = json.dumps(json_to_save, default=str)
 
     req = requests.post(URL_POST, json_result)
-    # rprint(f"\nresponse from request: {req.text}")
 
 
 def find_algorithm_names(df: pd.DataFrame) -> list:
@@ -68,10 +70,17 @@ def compute(y: list, X_confidence: list, threshold: float):
 def compute(y: list, X_confidence: list, X_label: list) -> Card:
     tn, fp, fn, tp = metrics.confusion_matrix(y, X_label).ravel()
     f1 = metrics.f1_score(y, X_label)
-    fig_roc = metrics.RocCurveDisplay.from_predictions(y, X_confidence)
+    
+    # TODO try to implement merging multiple values, 
+    #       https://scikit-learn.org/stable/visualizations.html#visualizations
+    #      need to add new roc curve to `fig_roc`
+    fig_roc = metrics.RocCurveDisplay.from_predictions(y, X_confidence) 
+    
+    # fpr, tpr, thresholds = metrics.roc_curve(y, X_confidence)
+    # roc_auc = metrics.auc(fpr, tpr)
+    # fig_roc = metrics.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='example estimator')
+    
     card_data = Card(fig_roc, tn, fp, fn, tp, f1)
-
-    # format_float_f1 = round(f1,2)
     return card_data
 
 
@@ -85,7 +94,6 @@ def create_card(column: List["DeltaGenerator"], algorithm_name: str, card_data: 
 
         # Conf matrix creation
         st.subheader(f"Confidence matrix")
-        # card_data.get_conf_matrix_list()
         df_table = card_data.get_conf_matrix_pd()
         st.table(df_table)
 
@@ -93,29 +101,34 @@ def create_card(column: List["DeltaGenerator"], algorithm_name: str, card_data: 
         st.subheader("f1 score")
         st.text(card_data.get_f1())
 
-    # return
-
 
 if __name__ == "__main__":
     # x_label is for conf-matrix and f1 score
     # x_confidence is for ROC graph
 
-    st.title("Algorithm evaluator")
+    st.title("🧾 Algorithm evaluator ")
     st.text("Choose from previous database entries or upload csv")
-    req = requests.get(URL_GET_ALL)
-    res_json = req.json()
+    try:
+        req = requests.get(URL_GET_ALL)
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+        st.error(
+            f'{e.__class__.__name__}. Tried reaching backend for too long..', icon="🚨")
+        res_json = []
+    else:
+        res_json = req.json()
+
     with st.form("dataset"):
         st.header('Retrieve from db')
         prepared_options = [e["algorithm"]+" - "+e["id"] for e in res_json]
         prepared_options.insert(0, "None")
         option = st.selectbox(
-            'Choose result would you like to use, if none, upload a csv first below',
+            'Choose which result would you like to use, if nothing appears, upload a csv first below.',
             index=0,
+            help='format meaning: [algorithm name] - [UUID]',
             options=prepared_options,
-            # on_change=select_helper,
-            # args=option.split(" - ")[1]
         )
         submitted = st.form_submit_button("Submit")
+        
         if submitted:
             try:
                 id = option.split(" - ")[1]
@@ -128,15 +141,14 @@ if __name__ == "__main__":
                 X_label = create_roc_label(x_conf=X_confidence, threshold=0.5)
 
                 algorithm_name = ret_json["algorithm"]
-                column = st.columns(3, gap="medium")[0]
+                column = st.columns(1, gap="medium")[0]
                 card_data = compute(y, X_confidence, X_label)
-                # exit()
                 create_card(column, algorithm_name, card_data)
-            except IndexError:
-                # st.error(‘Please enter a valid input’)
+            except IndexError as e:
                 st.error(
-                    'There are no entries in the database, upload a csv to save results to  the database', icon="🚨")
-
+                    f'{e.__class__.__name__}. If there are no entries in the database, upload a csv and save results to the database 😄', icon="🚨")
+    st.button('Clear DB',
+              on_click=clean_db)
     st.header('CSV upload')
     agree = st.checkbox(
         'I want to save the result to the database.', value=True)
@@ -155,7 +167,6 @@ if __name__ == "__main__":
             X_confidence = df[f"accuracy_{algorithm_name}"]
             X_label = df[f"labels_{algorithm_name}"]
             card_data = compute(y, X_confidence, X_label)
-            # exit()
             create_card(column, algorithm_name, card_data)
             if agree:
                 save_to_db(algorithm_name, card_data.get_conf_matrix_list(
