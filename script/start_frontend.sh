@@ -1,3 +1,3 @@
 #!/bin/sh
 cd ..
-streamlit run new_streamlit.py
+streamlit run streamlit_app.py

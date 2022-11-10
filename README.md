@@ -36,20 +36,22 @@ To start the backend
 cd script
 ./start_backend.sh
 ```
+Open a new terminal
 
-To start the frontend
+
+Then start the frontend
 ```sh
 cd script
 ./start_frontend.sh
 ```
 
-Open the URL the frontend gives (probably http://localhost:8501), and upload a csv.
+Open the URL the `start_frontend.sh` gives (probably http://localhost:8501), and upload a csv.
 <img src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/streamlit_running.png">
 
 
 # To reset database
 
-The `generator.py` can create a new database from `initialiser.sql` (and adds one entry)
+The `generator.py` can create a new database from `initialiser.sql`
 ```sh
 cd backend
 python3 generator.py init
