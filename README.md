@@ -1,9 +1,25 @@
 # algorithm-evaluator
 
-### **For evaluating algorithms powered by streamlit and fastapi**
+![Algorithm evaluator header](/docs/header.png)
+### For automatically computing performance metrics for algorithms.
+Powered by [Streamlit](https://streamlit.io/) <img src="https://streamlit.io/favicon.svg" width="20"> and [FastAPI](https://fastapi.tiangolo.com/) <img src="https://fastapi.tiangolo.com/img/favicon.png" width="20"> 
+
+&nbsp;
+<!-- 
+## Features
+### .csv upload
+&nbsp;
+![](/docs/csv_upload.png)
+
+### Retrieve from db
+&nbsp;
+
+![](/docs/retrieve_from_db.png) -->
+
+<!-- 
 <p align="center">
   <img src="https://raw.githubusercontent.com/v4k0nd/algorithm-evaluator/master/docs/app_preview.png">
-</p>
+</p> -->
 
 # Install and run via docker (recommended)
 ```sh
