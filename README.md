@@ -2,7 +2,7 @@
 
 ![Algorithm evaluator header](/docs/header.png)
 ### For automatically computing performance metrics for algorithms.
-Powered by [Streamlit](https://streamlit.io/) <img src="https://streamlit.io/favicon.svg" width="20"> and [FastAPI](https://fastapi.tiangolo.com/) <img src="https://fastapi.tiangolo.com/img/favicon.png" width="20"> 
+Powered by [Streamlit <img src="https://streamlit.io/favicon.svg" width="20">](https://streamlit.io/) and [FastAPI <img src="https://fastapi.tiangolo.com/img/favicon.png" width="20"> ](https://fastapi.tiangolo.com/)
 
 &nbsp;
 <!-- 
