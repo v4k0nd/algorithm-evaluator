@@ -1,8 +1,10 @@
 # algorithm-evaluator
 
 ![Algorithm evaluator header](/docs/header.png)
-### For automatically computing performance metrics for algorithms.
+### For automatically computing performance metrics for algorithms from a csv.
 Powered by [Streamlit <img src="https://streamlit.io/favicon.svg" width="20">](https://streamlit.io/) and [FastAPI <img src="https://fastapi.tiangolo.com/img/favicon.png" width="20"> ](https://fastapi.tiangolo.com/)
+
+
 
 &nbsp;
 <!-- 
@@ -79,6 +81,13 @@ cd backend
 python3 generator.py populate
 ```
 
+# Structure
+The evaluation framework consists of two containers, frontend and backend. The frontend is built with Streamlit, and the backend is built with FastAPI and SQLite. The backend contained only one table, as shown in Figure 6, where the roc_ys and roc_xs represent the ground truth and the confidence respectively, and are used to recalculate the ROC curve using `scikit-learn`’s `RocCurveDisplay.from_predictions()`.
+
+![System diagram](docs/system_diagram.png)
+
+## Example output diagram
+![ROC Graph](docs/ROC_graph.png)
 
 # Database structure
 - `id`
